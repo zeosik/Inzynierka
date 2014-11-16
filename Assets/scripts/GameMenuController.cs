@@ -11,11 +11,13 @@ public class GameMenuController : MonoBehaviour {
 	TextMesh[] meshes;
 	int selectedIndex = 0;
 
+
 	// Use this for initialization
 	void Start () {
+		//this.transform.
 		meshes = new TextMesh[menuItems.Length];
 		textItems = new GameObject[menuItems.Length];
-		float distanceToFloor = 1f;
+		float distanceToFloor = 0.5f;
 		float offset = distanceToFloor + menuItems.Length * 1.5f + 0.5f;
 		this.transform.localScale = new Vector3(this.transform.localScale.x, menuItems.Length * 1.5f + 2f, this.transform.localScale.z);
 		this.transform.position = new Vector3(this.transform.position.x, this.transform.localScale.y / 2f + distanceToFloor, this.transform.position.z);
@@ -24,23 +26,17 @@ public class GameMenuController : MonoBehaviour {
 		Quaternion q = this.transform.rotation; //new Quaternion(0f, 180f, 0f, 1f);
 		for (int i = 0; i < menuItems.Length; ++i) {
 			Vector3 v = new Vector3 (this.transform.position.x , offset, this.transform.position.z);
-			//(text.GetComponent("TextMesh") as TextMesh).text = menuItems[i];
-			//(text.GetComponent("TextMesh") as TextMesh).color = Color.red;
-			//textItems[i] = text;
 
-
-			/*if(i == 0) {
-				text.GetComponent<TextMesh>().font.material.color = Color.red;
-			} else if(i == 1) {
-				text.GetComponent<TextMesh>().font.material.color = Color.green;
-			} else {
-				text.GetComponent<TextMesh>().font.material.color = Color.blue;
-			}*/
-			print (text.GetComponent<TextMesh>().text);
+			//print (text.GetComponent<TextMesh>().text);
 			textItems[i] = (GameObject) Instantiate (text, v, q);
+
+			textItems[i].transform.LookAt(GameObject.FindGameObjectWithTag("camera").transform.position);
+
 			DestroyImmediate(textItems[i].GetComponent<TextMesh>());
-			print (text.GetComponent<TextMesh>().text);
+
+			//print (text.GetComponent<TextMesh>().text);
 			meshes[i] = textItems[i].AddComponent<TextMesh>();
+
 			TextMesh tmp = text.GetComponent<TextMesh>();
 			meshes[i].alignment = tmp.alignment;
 			meshes[i].anchor = tmp.anchor;
@@ -49,7 +45,9 @@ public class GameMenuController : MonoBehaviour {
 			meshes[i].fontStyle = tmp.fontStyle;
 			meshes[i].characterSize = tmp.characterSize;
 			meshes[i].text = menuItems[i];
+
 			meshes[i].color = Color.gray;
+
 			offset -= 1.5f;
 		}
 		meshes [selectedIndex].color = Color.white;
@@ -60,7 +58,11 @@ public class GameMenuController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
+		this.transform.LookAt(GameObject.FindGameObjectWithTag ("camera").transform.position);
+		this.transform.Rotate(0f, 180f, 0f);
+		for (int i = 0; i < textItems.Length; ++i) {
+			textItems[i].transform.rotation = this.transform.rotation;
+		}
 	}
 
 	private void menuControl() {
@@ -84,9 +86,5 @@ public class GameMenuController : MonoBehaviour {
 		} else if (menuItems [selectedIndex].ToLower ().Equals ("exit")) {
 			Application.Quit();
 		}
-	}
-	void TestFunc() {
-		print ("testfunc");
-		Application.LoadLevel("game");
 	}
 }
