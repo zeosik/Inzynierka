@@ -14,29 +14,30 @@ public class BobsleighController : MonoBehaviour {
 	}
 	void Update()
 	{
+		this.rigidbody.AddForce(this.transform.up * 100.0f, ForceMode.Force);
 		if(OVRDevice.IsHMDPresent())
 		{
 			Vector3 p = new Vector3();
 			Quaternion Ovrinput=Quaternion.identity;
 			OVRDevice.GetCameraPositionOrientation (ref p, ref Ovrinput, 0);
 			float ovrZAngle = Ovrinput.eulerAngles.z;
-			if(ovrZAngle < 5.0f || ovrZAngle > 355.0f)
+			if(ovrZAngle < 10.0f || ovrZAngle > 350.0f)
 			{
 				steer = 0.0f;
 			}
 			else if(ovrZAngle < 180.0f)
 			{
-				if(ovrZAngle > 60.0f)
+				if(ovrZAngle > 70.0f)
 					steer = -1.0f;
 				else
-					steer = ovrZAngle / -60.0f;
+					steer = (ovrZAngle - 10.0f) / -60.0f;
 			}
 			else if(ovrZAngle > 180.0f)
 			{
-				if(ovrZAngle < 300.0f)
+				if(ovrZAngle < 290.0f)
 					steer = 1.0f;
 				else
-					steer = (360.0f - ovrZAngle) / 60.0f;
+					steer = (350.0f - ovrZAngle) / 60.0f;
 			}
 		}
 		else
