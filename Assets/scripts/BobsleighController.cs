@@ -11,6 +11,9 @@ public class BobsleighController : MonoBehaviour {
 	void Start()
 	{
 		OVRDevice.ResetOrientation();
+		print (this.rigidbody.centerOfMass);
+		this.rigidbody.centerOfMass = new Vector3 (0, 0, -0.95f);
+		print (this.rigidbody.centerOfMass);
 	}
 	void Update()
 	{
