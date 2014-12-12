@@ -7,6 +7,7 @@ public class GameMenuController : MonoBehaviour {
 	public string[] menuItems;
 	//public GameObject gameMenu;
 	public GameObject text;
+	public float distanceToFloor;
 	GameObject[] textItems;
 	TextMesh[] meshes;
 	int selectedIndex = 0;
@@ -17,10 +18,10 @@ public class GameMenuController : MonoBehaviour {
 		//this.transform.
 		meshes = new TextMesh[menuItems.Length];
 		textItems = new GameObject[menuItems.Length];
-		float distanceToFloor = 0.5f;
-		float offset = distanceToFloor + menuItems.Length * 1.5f + 0.5f;
+		//float distanceToFloor = 0.5f;
+		float offset = this.transform.position.y - this.transform.localScale.y / 2f + menuItems.Length * 1.5f;
 		this.transform.localScale = new Vector3(this.transform.localScale.x, menuItems.Length * 1.5f + 2f, this.transform.localScale.z);
-		this.transform.position = new Vector3(this.transform.position.x, this.transform.localScale.y / 2f + distanceToFloor, this.transform.position.z);
+		this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z);
 		
 		//Vector3 position = this.transform.position;
 		Quaternion q = this.transform.rotation; //new Quaternion(0f, 180f, 0f, 1f);
@@ -46,11 +47,11 @@ public class GameMenuController : MonoBehaviour {
 			meshes[i].characterSize = tmp.characterSize;
 			meshes[i].text = menuItems[i];
 
-			meshes[i].color = Color.gray;
+			meshes[i].color = Color.blue;
 
 			offset -= 1.5f;
 		}
-		meshes [selectedIndex].color = Color.white;
+		meshes [selectedIndex].color = Color.green;
 		//meshes [0].color = Color.green;
 		//meshes [1].color = Color.white;
 		//meshes [2].color = Color.red;
@@ -58,15 +59,18 @@ public class GameMenuController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		this.transform.LookAt(GameObject.FindGameObjectWithTag ("camera").transform.position);
+		Vector3 camera = GameObject.FindGameObjectWithTag("camera").transform.position;
+		camera.y = this.transform.position.y;
+		this.transform.LookAt(camera);
 		this.transform.Rotate(0f, 180f, 0f);
+		this.transform.rotation = new Quaternion(0f, this.transform.rotation.y, this.transform.rotation.z, this.transform.rotation.w);
 		for (int i = 0; i < textItems.Length; ++i) {
 			textItems[i].transform.rotation = this.transform.rotation;
 		}
 	}
 
 	private void menuControl() {
-		meshes [selectedIndex].color = Color.gray;
+		meshes [selectedIndex].color = Color.blue;
 		if (Input.GetKeyDown (KeyCode.Return)) {
 			executeAction ();
 		} else if (Input.GetKeyDown (KeyCode.DownArrow)) {
@@ -76,7 +80,7 @@ public class GameMenuController : MonoBehaviour {
 		} else if (Input.GetKeyDown (KeyCode.V)) {
 			print ("selected: " + selectedIndex);
 		}
-		meshes [selectedIndex].color = Color.white;
+		meshes [selectedIndex].color = Color.green;
 	}
 
 	private void executeAction() {
