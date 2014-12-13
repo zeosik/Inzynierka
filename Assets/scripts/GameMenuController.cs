@@ -8,8 +8,13 @@ public class GameMenuController : MonoBehaviour {
 	//public GameObject gameMenu;
 	public GameObject text;
 	public float distanceToFloor;
+	public Font font;
+	public Material selectedFontShaderMaterial;
+	public Material unselectedFontShaderMaterial;
+	//public Shader fontShader;
 	GameObject[] textItems;
 	TextMesh[] meshes;
+	//MeshRenderer[] meshRenderers;
 	int selectedIndex = 0;
 
 
@@ -28,10 +33,11 @@ public class GameMenuController : MonoBehaviour {
 		for (int i = 0; i < menuItems.Length; ++i) {
 			Vector3 v = new Vector3 (this.transform.position.x , offset, this.transform.position.z);
 
-			//print (text.GetComponent<TextMesh>().text);
 			textItems[i] = (GameObject) Instantiate (text, v, q);
 
 			textItems[i].transform.LookAt(GameObject.FindGameObjectWithTag("camera").transform.position);
+
+			textItems[i].renderer.material = unselectedFontShaderMaterial;
 
 			DestroyImmediate(textItems[i].GetComponent<TextMesh>());
 
@@ -41,17 +47,19 @@ public class GameMenuController : MonoBehaviour {
 			TextMesh tmp = text.GetComponent<TextMesh>();
 			meshes[i].alignment = tmp.alignment;
 			meshes[i].anchor = tmp.anchor;
-			meshes[i].font = tmp.font;
-			meshes[i].fontSize = tmp.fontSize;
-			meshes[i].fontStyle = tmp.fontStyle;
+			meshes[i].font = font;//tmp.font;
+			//meshes[i].fontSize = tmp.fontSize;
+			//meshes[i].fontStyle = tmp.fontStyle;
 			meshes[i].characterSize = tmp.characterSize;
 			meshes[i].text = menuItems[i];
 
 			meshes[i].color = Color.blue;
-
+			meshes[i].offsetZ = -1;
+			print (meshes[i] + " " + meshes[i].text + " " + meshes[i].color);
 			offset -= 1.5f;
 		}
 		meshes [selectedIndex].color = Color.green;
+		textItems[selectedIndex].renderer.material = selectedFontShaderMaterial;
 		//meshes [0].color = Color.green;
 		//meshes [1].color = Color.white;
 		//meshes [2].color = Color.red;
@@ -71,6 +79,7 @@ public class GameMenuController : MonoBehaviour {
 
 	private void menuControl() {
 		meshes [selectedIndex].color = Color.blue;
+		textItems[selectedIndex].renderer.material = unselectedFontShaderMaterial;
 		if (Input.GetKeyDown (KeyCode.Return)) {
 			executeAction ();
 		} else if (Input.GetKeyDown (KeyCode.DownArrow)) {
@@ -81,6 +90,7 @@ public class GameMenuController : MonoBehaviour {
 			print ("selected: " + selectedIndex);
 		}
 		meshes [selectedIndex].color = Color.green;
+		textItems[selectedIndex].renderer.material = selectedFontShaderMaterial;
 	}
 
 	private void executeAction() {
