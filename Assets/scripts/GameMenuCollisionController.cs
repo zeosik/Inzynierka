@@ -19,7 +19,7 @@ public class GameMenuCollisionController : MonoBehaviour {
 		if (Physics.Raycast(this.transform.position, this.transform.forward, out hit)) {
 
 			//print("Hit something " + hit.distance + " " + hit.collider.name);
-			if(hit.collider.name.Equals("game1menu")) {
+			if(hit.collider.tag.Equals("menu")) {
 				hit.collider.SendMessage("menuControl");
 				//print ("znalazlem");
 				//if(Input.GetMouseButtonDown(0)) {

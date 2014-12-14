@@ -51,4 +51,13 @@ public class BobsleighController : MonoBehaviour {
 		WheelFL.steerAngle = steer_max * steer;
 		WheelFR.steerAngle = steer_max * steer;
 	}
+
+	void gameWon()
+	{
+		//this.rigidbody.velocity = this.rigidbody.velocity * 2f;
+		this.rigidbody.velocity = Vector3.zero;
+		this.rigidbody.isKinematic = true;
+		//this.rigidbody.useGravity = false;
+		//this.rigidbody.Sleep();
+	}
 }

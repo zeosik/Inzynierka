@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class GameMenuController : MonoBehaviour {
 
@@ -11,12 +12,14 @@ public class GameMenuController : MonoBehaviour {
 	public Font font;
 	public Material selectedFontShaderMaterial;
 	public Material unselectedFontShaderMaterial;
+	public Slider loadingBar;
 	//public Shader fontShader;
 	GameObject[] textItems;
 	TextMesh[] meshes;
 	//MeshRenderer[] meshRenderers;
 	int selectedIndex = 0;
 
+	private AsyncOperation async;
 
 	// Use this for initialization
 	void Start () {
@@ -54,8 +57,7 @@ public class GameMenuController : MonoBehaviour {
 			meshes[i].text = menuItems[i];
 
 			meshes[i].color = Color.blue;
-			meshes[i].offsetZ = -1;
-			print (meshes[i] + " " + meshes[i].text + " " + meshes[i].color);
+			meshes[i].offsetZ = -0.55f;
 			offset -= 1.5f;
 		}
 		meshes [selectedIndex].color = Color.green;
@@ -94,11 +96,21 @@ public class GameMenuController : MonoBehaviour {
 	}
 
 	private void executeAction() {
-		print (menuItems [selectedIndex]);
 		if (menuItems [selectedIndex].ToLower ().Equals ("start")) {
-			Application.LoadLevel (gameName);
+			GlobalSettings.setMenuUserPosition();
+			StartCoroutine(LoadLevel());
+			//Application.LoadLevel (gameName);
 		} else if (menuItems [selectedIndex].ToLower ().Equals ("exit")) {
 			Application.Quit();
+		}
+	}
+	IEnumerator LoadLevel()
+	{
+		async = Application.LoadLevelAsync(gameName);
+		while(!async.isDone)
+		{
+			loadingBar.value = async.progress;
+			yield return null;
 		}
 	}
 }
