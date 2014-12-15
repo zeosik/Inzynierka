@@ -5,15 +5,21 @@ public class BobsleighController : MonoBehaviour {
 	
 	public WheelCollider WheelFR;
 	public WheelCollider WheelFL;
-	
+
+	static BobsleighController bobsleigh;
+	Vector3 velocity;
+	Vector3 angularVelocity;
 	int steer_max = 10;
-	private float steer = 0.0f;
+	float steer = 0.0f;
+
 	void Start()
 	{
+		bobsleigh = gameObject.transform.GetComponent<BobsleighController>();
+
 		OVRDevice.ResetOrientation();
-		print (this.rigidbody.centerOfMass);
+		//print (this.rigidbody.centerOfMass);
 		this.rigidbody.centerOfMass = new Vector3 (0, 0, -0.95f);
-		print (this.rigidbody.centerOfMass);
+		//print (this.rigidbody.centerOfMass);
 	}
 	void Update()
 	{
@@ -52,11 +58,24 @@ public class BobsleighController : MonoBehaviour {
 		WheelFR.steerAngle = steer_max * steer;
 	}
 
-	void gameWon()
+	static public void pause()
+	{
+		bobsleigh.velocity = bobsleigh.rigidbody.velocity;
+		bobsleigh.angularVelocity = bobsleigh.rigidbody.angularVelocity;
+		bobsleigh.rigidbody.isKinematic = true;
+	}
+
+	static public void resume()
+	{
+		bobsleigh.rigidbody.isKinematic = false;
+		bobsleigh.rigidbody.velocity = bobsleigh.velocity;
+		bobsleigh.rigidbody.angularVelocity = bobsleigh.angularVelocity;
+	}
+
+	static public void gameWon()
 	{
 		//this.rigidbody.velocity = this.rigidbody.velocity * 2f;
-		this.rigidbody.velocity = Vector3.zero;
-		this.rigidbody.isKinematic = true;
+		pause();
 		//this.rigidbody.useGravity = false;
 		//this.rigidbody.Sleep();
 	}

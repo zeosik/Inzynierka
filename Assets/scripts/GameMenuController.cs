@@ -12,7 +12,7 @@ public class GameMenuController : MonoBehaviour {
 	public Font font;
 	public Material selectedFontShaderMaterial;
 	public Material unselectedFontShaderMaterial;
-	public Slider loadingBar;
+	//public Slider loadingBar;
 	//public Shader fontShader;
 	GameObject[] textItems;
 	TextMesh[] meshes;
@@ -109,7 +109,7 @@ public class GameMenuController : MonoBehaviour {
 		async = Application.LoadLevelAsync(gameName);
 		while(!async.isDone)
 		{
-			loadingBar.value = async.progress;
+			//loadingBar.value = async.progress;
 			yield return null;
 		}
 	}
