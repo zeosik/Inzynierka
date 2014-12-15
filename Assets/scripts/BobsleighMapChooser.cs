@@ -7,6 +7,8 @@ public class BobsleighMapChooser : MonoBehaviour {
 	public string levelName;
 	public Slider loadingBar;
 
+	string enterInfoText = "press ENTER to ";
+
 	private AsyncOperation async;
 
 	void OnTriggerEnter(Collider collider) 
@@ -15,7 +17,15 @@ public class BobsleighMapChooser : MonoBehaviour {
 		foreach(Canvas item in list)
 		{
 			if(item.tag.Equals("info"))
+			{
 				item.enabled = true;
+				if(this.name.ToLower().Contains("map"))
+					item.GetComponentInChildren<Text>().text = enterInfoText + "start";
+				else if(this.name.ToLower().Contains("menu"))
+					item.GetComponentInChildren<Text>().text = enterInfoText + "go back to menu";
+
+				break;
+			}
 		}
 	}
 
@@ -23,7 +33,10 @@ public class BobsleighMapChooser : MonoBehaviour {
 	{
 		if (Input.GetKeyDown (KeyCode.Return)) 
 		{
-			StartCoroutine(LoadLevel());
+			if(this.name.ToLower().Contains("map"))
+			   	StartCoroutine(LoadLevel());
+		   	else if(this.name.ToLower().Contains("menu"))
+	        	Application.LoadLevel("menu");
 		}
 	}
 
@@ -43,7 +56,10 @@ public class BobsleighMapChooser : MonoBehaviour {
 		foreach(Canvas item in list)
 		{
 			if(item.tag.Equals("info"))
+			{
 				item.enabled = false;
+				break;
+			}
 		}
 	}
 }
