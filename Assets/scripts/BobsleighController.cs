@@ -6,6 +6,9 @@ public class BobsleighController : MonoBehaviour {
 	public WheelCollider WheelFR;
 	public WheelCollider WheelFL;
 
+	private Vector3 startingPosition;
+	private Quaternion startingRotation;
+
 	static BobsleighController bobsleigh;
 	Vector3 velocity;
 	Vector3 angularVelocity;
@@ -14,6 +17,9 @@ public class BobsleighController : MonoBehaviour {
 
 	void Start()
 	{
+		startingPosition = this.rigidbody.position;
+		startingRotation = this.rigidbody.rotation;
+
 		bobsleigh = gameObject.transform.GetComponent<BobsleighController>();
 
 		OVRDevice.ResetOrientation();
@@ -74,9 +80,18 @@ public class BobsleighController : MonoBehaviour {
 
 	static public void gameWon()
 	{
-		//this.rigidbody.velocity = this.rigidbody.velocity * 2f;
-		pause();
-		//this.rigidbody.useGravity = false;
-		//this.rigidbody.Sleep();
+		if(Network.isServer)
+			GameObject.Find("bobslej").networkView.RPC("togglePauseGame", RPCMode.All, null);
+		else if(!Network.isClient)
+			pause();
+	}
+
+	static public void restartGame()
+	{
+		bobsleigh.rigidbody.position = bobsleigh.startingPosition;
+		bobsleigh.rigidbody.rotation = bobsleigh.startingRotation;
+		bobsleigh.rigidbody.velocity = Vector3.zero;
+		bobsleigh.rigidbody.angularVelocity = Vector3.zero;
+		GameController.togglePauseGame();
 	}
 }

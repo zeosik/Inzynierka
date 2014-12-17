@@ -5,6 +5,8 @@ public class GameController : MonoBehaviour {
 
 	private bool paused = false;
 	private bool inMenu = false;
+	private bool inNetworkMenu = false;
+
 	static GameController gameController;
 	// Use this for initialization
 	void Start () {
@@ -17,10 +19,17 @@ public class GameController : MonoBehaviour {
 //			Application.LoadLevel("menu");
 //		}
 		if(Input.GetKeyDown(KeyCode.P)) {
-			togglePauseGame();
+			//togglePauseGame();
+			if(Network.isServer)
+				GameObject.Find("bobslej").networkView.RPC("togglePauseGame", RPCMode.All, null);
+			else if(!Network.isClient)
+				togglePauseGame();
 		}
 		if(Input.GetKeyDown(KeyCode.Escape)) {
-			toggleMenu();
+			if(inNetworkMenu)
+				toggleNetworkMenu();
+			else
+				toggleMenu();
 		}
 	}
 	public static void togglePauseGame()
@@ -53,7 +62,19 @@ public class GameController : MonoBehaviour {
 			{
 				gameController.inMenu = !gameController.inMenu;
 				item.enabled = gameController.inMenu;
-				//pauseGame();	//Delete later on, when pausing is implemented as a new option in menu
+			}
+		}
+	}
+	public static void toggleNetworkMenu()
+	{
+		BobsleighMenuController.toggleNetworkMenu();
+		Canvas[] list = FindObjectsOfType<Canvas>();
+		foreach(Canvas item in list)
+		{
+			if(item.tag.Equals("networkMenu"))
+			{
+				gameController.inNetworkMenu = !gameController.inNetworkMenu;
+				item.enabled = gameController.inNetworkMenu;
 			}
 		}
 	}
