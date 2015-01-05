@@ -7,7 +7,6 @@ public class NetworkManager : MonoBehaviour {
 	public Button[] menuItems;
 	public Object prefab;
 
-	private bool networkMenuActive = false;
 	private int selectedIndex = 0;
 
 	private const string typeName = "TotalPwnageGameName";
@@ -108,23 +107,20 @@ public class NetworkManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if(networkMenuActive)
+		if(Input.GetKeyDown(KeyCode.DownArrow))
 		{
-			if(Input.GetKeyDown(KeyCode.DownArrow))
-			{
-				selectNext();
+			selectNext();
 
-			} 
-			else if(Input.GetKeyDown(KeyCode.UpArrow))
-			{
-				selectPrev();
+		} 
+		else if(Input.GetKeyDown(KeyCode.UpArrow))
+		{
+			selectPrev();
 
-			} 
-			else if(Input.GetKeyDown(KeyCode.Return))
-			{
-				if(menuItems[selectedIndex].interactable)
-					executeAction();
-			}
+		} 
+		else if(Input.GetKeyDown(KeyCode.Return))
+		{
+			if(menuItems[selectedIndex].interactable)
+				executeAction();
 		}
 	}
 	void selectNext()

@@ -23,41 +23,75 @@ public class BobsleighController : MonoBehaviour {
 		bobsleigh = gameObject.transform.GetComponent<BobsleighController>();
 
 		OVRDevice.ResetOrientation();
-		//print (this.rigidbody.centerOfMass);
 		this.rigidbody.centerOfMass = new Vector3 (0, 0, -0.95f);
-		//print (this.rigidbody.centerOfMass);
 	}
 	void Update()
 	{
 		this.rigidbody.AddForce(this.transform.up * 100.0f, ForceMode.Force);
+
 		if(OVRDevice.IsHMDPresent())
 		{
 			Vector3 p = new Vector3();
 			Quaternion Ovrinput=Quaternion.identity;
 			OVRDevice.GetCameraPositionOrientation (ref p, ref Ovrinput, 0);
-			float ovrZAngle = Ovrinput.eulerAngles.z;
-			if(ovrZAngle < 10.0f || ovrZAngle > 350.0f)
+
+			if(Network.isClient)
 			{
-				steer = 0.0f;
+				GameObject.Find ("Player2").transform.localEulerAngles = Ovrinput.eulerAngles;//new Vector3(Ovrinput.eulerAngles.z, Ovrinput.eulerAngles.x, Ovrinput.eulerAngles.y);
 			}
-			else if(ovrZAngle < 180.0f)
+			else
 			{
-				if(ovrZAngle > 70.0f)
-					steer = -1.0f;
-				else
-					steer = (ovrZAngle - 10.0f) / -60.0f;
-			}
-			else if(ovrZAngle > 180.0f)
-			{
-				if(ovrZAngle < 290.0f)
-					steer = 1.0f;
-				else
-					steer = (350.0f - ovrZAngle) / 60.0f;
+				//GameObject.Find ("Player1").transform.localEulerAngles = new Vector3(Ovrinput.eulerAngles.z, Ovrinput.eulerAngles.x, Ovrinput.eulerAngles.y);
+				GameObject.Find ("Player1").transform.localEulerAngles = Ovrinput.eulerAngles;
 			}
 		}
+
+
+		if (Network.isClient)
+			return;
 		else
+			updateRotation ();
+	}
+	void updateRotation()
+	{
+		float headAngle = GameObject.Find ("Player1").transform.localRotation.eulerAngles.z;
+		if(headAngle < 10.0f || headAngle > 350.0f)
 		{
-			steer = Mathf.Clamp(Input.GetAxis("Horizontal"), -1, 1);
+			steer = 0.0f;
+		}
+		else if(headAngle < 180.0f)
+		{
+			if(headAngle > 70.0f)
+				steer = -1.0f;
+			else
+				steer = (headAngle - 10.0f) / -60.0f;
+		}
+		else if(headAngle > 180.0f)
+		{
+			if(headAngle < 290.0f)
+				steer = 1.0f;
+			else
+				steer = (350.0f - headAngle) / 60.0f;
+		}
+		
+		headAngle = GameObject.Find ("Player2").transform.localRotation.eulerAngles.z;
+		if(headAngle < 10.0f || headAngle > 350.0f)
+		{
+			steer += 0.0f;
+		}
+		else if(headAngle < 180.0f)
+		{
+			if(headAngle > 70.0f)
+				steer += (-1.0f)/3f;
+			else
+				steer += ((headAngle - 10.0f) / -60.0f)/3f;
+		}
+		else if(headAngle > 180.0f)
+		{
+			if(headAngle < 290.0f)
+				steer += (1.0f)/3f;
+			else
+				steer += ((350.0f - headAngle) / 60.0f)/3f;
 		}
 
 		WheelFL.steerAngle = steer_max * steer;
@@ -92,6 +126,8 @@ public class BobsleighController : MonoBehaviour {
 		bobsleigh.rigidbody.rotation = bobsleigh.startingRotation;
 		bobsleigh.rigidbody.velocity = Vector3.zero;
 		bobsleigh.rigidbody.angularVelocity = Vector3.zero;
-		GameController.togglePauseGame();
+		if(!GameController.isPaused())
+			GameController.togglePauseGame();
 	}
+
 }

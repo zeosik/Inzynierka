@@ -58,6 +58,8 @@ public class GameNetworkManager : MonoBehaviour {
 			print (hostList.Length);
 			if(hostList.Length > 0)
 				menuItems[2].interactable = true;
+			else
+				menuItems[2].interactable = false;
 		}
 	}
 	void JoinServer(HostData hostData)
@@ -71,26 +73,51 @@ public class GameNetworkManager : MonoBehaviour {
 		Network.Disconnect();
 		hostList = null;
 		menuItems[2].interactable = false;
+		menuItems[0].interactable = true;
 	}
 	
 	void OnConnectedToServer()
 	{
 		menu.menuItems[discButtIndex].interactable = true;
+		menuItems[2].interactable = false;
 		//GameObject obj = (GameObject)Network.Instantiate(prefab, this.transform.position, Quaternion.identity, 0);
 		//obj.transform.parent = this.transform;
 		if(Network.isClient)
 		{
 			GameObject.Find("OVRCameraController").transform.parent = GameObject.Find("Player2").transform;
-			GameObject.Find("Menus").transform.parent = GameObject.Find("Player2").transform;
+			GameObject.Find("Menus").transform.localPosition = new Vector3(-2.5f, 0f, 1.43f);
+			//GameObject.Find("Menus").transform.parent = GameObject.Find("Player2").transform;
 		}
 		else
 		{
 			GameObject.Find("OVRCameraController").transform.parent = GameObject.Find("Player1").transform;
-			GameObject.Find("Menus").transform.parent = GameObject.Find("Player1").transform;
+			GameObject.Find("Menus").transform.localPosition = new Vector3(-1.4f, 0f, 1.43f);
+			//GameObject.Find("Menus").transform.parent = GameObject.Find("Player1").transform;
 		}
-		GameObject.Find("Menus").transform.localPosition = new Vector3(-0.7f, 0f, -2.67f);
-		GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(0f, -0.6f,1f);
+		
+		//GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(-1f, -0.6f,1f);
+		GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(-0.2f, 0.1f, 0.1f);
+//		if(Network.isClient)
+//		{
+//			GameObject.Find("OVRCameraController").transform.parent = GameObject.Find("Player2").transform;
+//			GameObject.Find("Menus").transform.parent = GameObject.Find("Player2").transform;
+//		}
+//		else
+//		{
+//			GameObject.Find("OVRCameraController").transform.parent = GameObject.Find("Player1").transform;
+//			GameObject.Find("Menus").transform.parent = GameObject.Find("Player1").transform;
+//		}
+//		GameObject.Find("Menus").transform.localPosition = new Vector3(-0.7f, 0f, -2.67f);
+//		GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(0f, -0.6f,1f);
 		print ("connected");
+	}
+
+	void OnDisconnectedFromServer()
+	{
+		GameObject.Find("OVRCameraController").transform.parent = GameObject.Find("Player1").transform;
+		GameObject.Find("Menus").transform.localPosition = new Vector3(-1.4f, 0f, 1.43f);
+		GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(-0.2f, 0.1f, 0.1f);
+		GameObject.Find ("Player2").transform.localRotation = Quaternion.identity;
 	}
 
 	void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
@@ -99,40 +126,45 @@ public class GameNetworkManager : MonoBehaviour {
 		Vector3 syncVelocity = Vector3.zero;
 		Vector3 syncPosition = Vector3.zero;
 		Quaternion syncRotation = Quaternion.identity;
+		Quaternion syncPlayerRotation = Quaternion.identity;
 		if(stream.isWriting)
 		{
-			if(Network.isServer)
-			{
-				syncAngularVelocity = this.rigidbody.angularVelocity;
-				syncVelocity = this.rigidbody.velocity;
-				syncPosition = this.rigidbody.position;
-				syncRotation = this.rigidbody.rotation;
+			syncAngularVelocity = this.rigidbody.angularVelocity;
+			syncVelocity = this.rigidbody.velocity;
+			syncPosition = this.rigidbody.position;
+			syncRotation = this.rigidbody.rotation;
+			syncPlayerRotation = GameObject.Find ("Player1").transform.localRotation;
 
-				stream.Serialize(ref syncAngularVelocity);
-				stream.Serialize(ref syncVelocity);
-				stream.Serialize(ref syncPosition);
-				stream.Serialize(ref syncRotation);
-			}
+			stream.Serialize(ref syncAngularVelocity);
+			stream.Serialize(ref syncVelocity);
+			stream.Serialize(ref syncPosition);
+			stream.Serialize(ref syncRotation);
+			stream.Serialize(ref syncPlayerRotation);
 		}
 		else
 		{
-			if(Network.isClient)
+			object[] args = new object[2];
+			args[0] = "Player2";
+			args[1] = GameObject.Find ("Player2").transform.localRotation;
+			this.networkView.RPC("updatePlayerRotation", RPCMode.Others, args);
+
+			stream.Serialize(ref syncAngularVelocity);
+			stream.Serialize(ref syncVelocity);
+				
+			if(!this.rigidbody.isKinematic)
 			{
-				stream.Serialize(ref syncAngularVelocity);
-				stream.Serialize(ref syncVelocity);
-					
-				if(!this.rigidbody.isKinematic)
-				{
-					this.rigidbody.angularVelocity = syncAngularVelocity;
-					this.rigidbody.velocity = syncVelocity;
-				}
-
-				stream.Serialize(ref syncPosition);
-				this.rigidbody.position = syncPosition;
-
-				stream.Serialize(ref syncRotation);
-				this.rigidbody.rotation = syncRotation;
+				this.rigidbody.angularVelocity = syncAngularVelocity;
+				this.rigidbody.velocity = syncVelocity;
 			}
+
+			stream.Serialize(ref syncPosition);
+			this.rigidbody.position = syncPosition;
+
+			stream.Serialize(ref syncRotation);
+			this.rigidbody.rotation = syncRotation;
+
+			stream.Serialize(ref syncPlayerRotation);
+			GameObject.Find ("Player1").transform.localRotation = syncPlayerRotation;
 		}
 	}
 	// Use this for initialization
@@ -144,15 +176,18 @@ public class GameNetworkManager : MonoBehaviour {
 		if(Network.isClient)
 		{
 			GameObject.Find("OVRCameraController").transform.parent = GameObject.Find("Player2").transform;
-			GameObject.Find("Menus").transform.parent = GameObject.Find("Player2").transform;
+			GameObject.Find("Menus").transform.localPosition = new Vector3(-2.5f, 0f, 1.43f);
+			//GameObject.Find("Menus").transform.parent = GameObject.Find("Player2").transform;
 		}
 		else
 		{
 			GameObject.Find("OVRCameraController").transform.parent = GameObject.Find("Player1").transform;
-			GameObject.Find("Menus").transform.parent = GameObject.Find("Player1").transform;
+			GameObject.Find("Menus").transform.localPosition = new Vector3(-1.4f, 0f, 1.43f);
+			//GameObject.Find("Menus").transform.parent = GameObject.Find("Player1").transform;
 		}
-		GameObject.Find("Menus").transform.localPosition = new Vector3(-0.7f, 0f, -2.67f);
-		GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(0f, -0.6f,1f);
+
+		//GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(-1f, -0.6f,1f);
+		GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(-0.2f, 0.1f, 0.1f);
 	}
 	
 	// Update is called once per frame
@@ -259,5 +294,10 @@ public class GameNetworkManager : MonoBehaviour {
 	public void restartGame()
 	{
 		BobsleighController.restartGame();
+	}
+	[RPC]
+	public void updatePlayerRotation(string playerName, Quaternion rotation )
+	{
+		GameObject.Find (playerName).transform.localRotation = rotation;
 	}
 }
