@@ -25,10 +25,20 @@ public class BobsleighController : MonoBehaviour {
 		OVRDevice.ResetOrientation();
 		this.rigidbody.centerOfMass = new Vector3 (0, 0, -0.95f);
 	}
-	void Update()
+	void FixedUpdate()
 	{
 		this.rigidbody.AddForce(this.transform.up * 100.0f, ForceMode.Force);
-
+		print(WheelFL.motorTorque + " " + WheelFL.rpm + " " + this.rigidbody.velocity.sqrMagnitude);
+		if(this.rigidbody.velocity.sqrMagnitude < 1500f)
+		{
+			WheelFL.motorTorque = 10f;
+			WheelFR.motorTorque = 10f;
+		}
+		else
+		{
+			WheelFL.motorTorque = 0;
+			WheelFR.motorTorque = 0;
+		}
 		if(OVRDevice.IsHMDPresent())
 		{
 			Vector3 p = new Vector3();
