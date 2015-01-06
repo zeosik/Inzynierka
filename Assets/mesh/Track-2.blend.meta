@@ -34,6 +34,8 @@ ModelImporter:
     100056: Track2_022
     100058: Track2_023
     100060: Track2_024
+    100062: Track2_001_MeshPart0
+    100064: Track2_001_MeshPart1
     400000: BezierCurve
     400002: BezierCurve_001
     400004: //RootNode
@@ -65,6 +67,8 @@ ModelImporter:
     400056: Track2_022
     400058: Track2_023
     400060: Track2_024
+    400062: Track2_001_MeshPart0
+    400064: Track2_001_MeshPart1
     2300000: BezierCurve
     2300002: BezierCurve_001
     2300004: left
@@ -95,6 +99,8 @@ ModelImporter:
     2300054: Track2_022
     2300056: Track2_023
     2300058: Track2_024
+    2300060: Track2_001_MeshPart0
+    2300062: Track2_001_MeshPart1
     3300000: BezierCurve
     3300002: BezierCurve_001
     3300004: left
@@ -125,6 +131,8 @@ ModelImporter:
     3300054: Track2_022
     3300056: Track2_023
     3300058: Track2_024
+    3300060: Track2_001_MeshPart0
+    3300062: Track2_001_MeshPart1
     4300000: BezierCurve_001
     4300002: BezierCurve
     4300004: Track2_024
@@ -155,6 +163,8 @@ ModelImporter:
     4300054: Track2_011
     4300056: Track2_007
     4300058: Track2_003
+    4300060: Track2_001_MeshPart0
+    4300062: Track2_001_MeshPart1
     7400000: Default Take
     9500000: //RootNode
   materials:
