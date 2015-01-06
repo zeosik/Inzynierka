@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EndGameController : MonoBehaviour {
+public class BobsleighOutOfTrackTrigger : MonoBehaviour {
 
 	void OnTriggerEnter(Collider collider)
 	{

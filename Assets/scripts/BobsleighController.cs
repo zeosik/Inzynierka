@@ -28,17 +28,32 @@ public class BobsleighController : MonoBehaviour {
 	void FixedUpdate()
 	{
 		this.rigidbody.AddForce(this.transform.up * 100.0f, ForceMode.Force);
-		print(WheelFL.motorTorque + " " + WheelFL.rpm + " " + this.rigidbody.velocity.sqrMagnitude);
+		//print(WheelFL.motorTorque + " " + WheelFL.rpm + " " + this.rigidbody.velocity.sqrMagnitude);
 		if(this.rigidbody.velocity.sqrMagnitude < 1500f)
 		{
-			WheelFL.motorTorque = 10f;
-			WheelFR.motorTorque = 10f;
+			WheelFL.motorTorque = 20f;
+			WheelFR.motorTorque = 20f;
 		}
 		else
 		{
 			WheelFL.motorTorque = 0;
 			WheelFR.motorTorque = 0;
 		}
+
+		float angle = this.transform.localEulerAngles.x;
+		if(angle > 180f) //>180 <=360 taking it to 0 -> 60 range
+		{
+			angle = 360f - angle;
+		}
+		angle -= 10f; //deleting range, where no speed is granted
+		if(angle > 0) //checking if angle is greater than 10 - grant speed
+		{
+			float speed = angle / 45f * 20f;
+
+			WheelFL.motorTorque += speed;
+			WheelFR.motorTorque += speed;
+		}
+
 		if(OVRDevice.IsHMDPresent())
 		{
 			Vector3 p = new Vector3();
@@ -55,7 +70,6 @@ public class BobsleighController : MonoBehaviour {
 				GameObject.Find ("Player1").transform.localEulerAngles = Ovrinput.eulerAngles;
 			}
 		}
-
 
 		if (Network.isClient)
 			return;
