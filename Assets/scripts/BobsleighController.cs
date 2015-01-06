@@ -104,6 +104,10 @@ public class BobsleighController : MonoBehaviour {
 				steer += ((350.0f - headAngle) / 60.0f)/3f;
 		}
 
+		//TODO: delete for final version - steering with arrows shouldn't be allowed
+		if(!OVRDevice.IsHMDPresent)
+			steer = Mathf.Clamp(Input.GetAxis("Horizontal"), -1, 1);
+
 		WheelFL.steerAngle = steer_max * steer;
 		WheelFR.steerAngle = steer_max * steer;
 	}
