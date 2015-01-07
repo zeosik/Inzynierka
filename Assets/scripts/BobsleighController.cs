@@ -27,7 +27,7 @@ public class BobsleighController : MonoBehaviour {
 	}
 	void FixedUpdate()
 	{
-		this.rigidbody.AddForce(this.transform.up * 100.0f, ForceMode.Force);
+		//this.rigidbody.AddForce(this.transform.up * 100.0f, ForceMode.Force);
 		//print(WheelFL.motorTorque + " " + WheelFL.rpm + " " + this.rigidbody.velocity.sqrMagnitude);
 		if(this.rigidbody.velocity.sqrMagnitude < 1500f)
 		{
