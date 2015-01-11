@@ -9,6 +9,8 @@ public class BobsleighController : MonoBehaviour {
 	private Vector3 startingPosition;
 	private Quaternion startingRotation;
 
+	private static float timer = 0f;
+
 	static BobsleighController bobsleigh;
 	Vector3 velocity;
 	Vector3 angularVelocity;
@@ -76,6 +78,13 @@ public class BobsleighController : MonoBehaviour {
 		else
 			updateRotation ();
 	}
+
+	void Update()
+	{
+		if(!GameController.isPaused())
+			timer += Time.deltaTime;
+	}
+
 	void updateRotation()
 	{
 		float headAngle = GameObject.Find ("Player1").transform.localRotation.eulerAngles.z;
@@ -126,6 +135,11 @@ public class BobsleighController : MonoBehaviour {
 		WheelFR.steerAngle = steer_max * steer;
 	}
 
+	static public void checkpoint()
+	{
+		GameController.newPopupInfo (BobsleighController.timer.ToString("F"));
+	}
+
 	static public void pause()
 	{
 		bobsleigh.velocity = bobsleigh.rigidbody.velocity;
@@ -150,6 +164,7 @@ public class BobsleighController : MonoBehaviour {
 
 	static public void restartGame()
 	{
+		timer = 0f;
 		bobsleigh.rigidbody.position = bobsleigh.startingPosition;
 		bobsleigh.rigidbody.rotation = bobsleigh.startingRotation;
 		bobsleigh.rigidbody.velocity = Vector3.zero;

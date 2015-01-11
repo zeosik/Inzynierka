@@ -5,6 +5,9 @@ public class BobsleighOutOfTrackTrigger : MonoBehaviour {
 
 	void OnTriggerEnter(Collider collider)
 	{
-		BobsleighController.gameWon();
+		if(collider.name.ToLower().Contains("checkpoint"))
+			BobsleighController.checkpoint ();
+		else
+			BobsleighController.gameWon();
 	}
 }

@@ -21,6 +21,7 @@ public class GameNetworkManager : MonoBehaviour {
 	
 	private void StartServer()
 	{
+		GameController.newPopupInfo ("starting server...");
 		//MasterServer.ipAddress = "127.0.0.1";
 		Network.InitializeServer(4, 25000, !Network.HavePublicAddress());
 		MasterServer.RegisterHost(typeName, gameName);
@@ -42,12 +43,14 @@ public class GameNetworkManager : MonoBehaviour {
 		//GameObject obj = (GameObject)Network.Instantiate(prefab, this.transform.position, Quaternion.identity, 0);
 		//obj.transform.parent = this.transform;
 		print("Server Initialized");
+		GameController.newPopupInfo ("server started");
 	}
 	
 	private void RefreshHostList()
 	{
 		MasterServer.RequestHostList(typeName);
 		print ("searching for servers");
+		GameController.newPopupInfo ("searching...");
 	}
 	
 	void OnMasterServerEvent(MasterServerEvent msEvent)
@@ -57,19 +60,28 @@ public class GameNetworkManager : MonoBehaviour {
 			hostList = MasterServer.PollHostList();
 			print (hostList.Length);
 			if(hostList.Length > 0)
+			{
 				menuItems[2].interactable = true;
+				GameController.newPopupInfo ("found");
+			}
 			else
+			{
 				menuItems[2].interactable = false;
+				GameController.newPopupInfo ("not found");
+			}
+
 		}
 	}
 	void JoinServer(HostData hostData)
 	{
 		print ("connecting to: " + hostData.ip);
+		GameController.newPopupInfo ("connecting...");
 		Network.Connect(hostData);
 	}
 	
 	void Disconnect()
 	{
+		GameController.newPopupInfo ("disconnecting...");
 		Network.Disconnect();
 		hostList = null;
 		menuItems[2].interactable = false;
@@ -80,44 +92,28 @@ public class GameNetworkManager : MonoBehaviour {
 	{
 		menu.menuItems[discButtIndex].interactable = true;
 		menuItems[2].interactable = false;
-		//GameObject obj = (GameObject)Network.Instantiate(prefab, this.transform.position, Quaternion.identity, 0);
-		//obj.transform.parent = this.transform;
 		if(Network.isClient)
 		{
 			GameObject.Find("OVRCameraController").transform.parent = GameObject.Find("Player2").transform;
 			GameObject.Find("Menus").transform.localPosition = new Vector3(-2.5f, 0f, 1.43f);
-			//GameObject.Find("Menus").transform.parent = GameObject.Find("Player2").transform;
 		}
 		else
 		{
 			GameObject.Find("OVRCameraController").transform.parent = GameObject.Find("Player1").transform;
 			GameObject.Find("Menus").transform.localPosition = new Vector3(-1.4f, 0f, 1.43f);
-			//GameObject.Find("Menus").transform.parent = GameObject.Find("Player1").transform;
 		}
-		
-		//GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(-1f, -0.6f,1f);
-		GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(-0.2f, 0.1f, 0.1f);
-//		if(Network.isClient)
-//		{
-//			GameObject.Find("OVRCameraController").transform.parent = GameObject.Find("Player2").transform;
-//			GameObject.Find("Menus").transform.parent = GameObject.Find("Player2").transform;
-//		}
-//		else
-//		{
-//			GameObject.Find("OVRCameraController").transform.parent = GameObject.Find("Player1").transform;
-//			GameObject.Find("Menus").transform.parent = GameObject.Find("Player1").transform;
-//		}
-//		GameObject.Find("Menus").transform.localPosition = new Vector3(-0.7f, 0f, -2.67f);
-//		GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(0f, -0.6f,1f);
+		GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(-0.212f, 0.1f, 0.1f);
 		print ("connected");
+		GameController.newPopupInfo ("connected");
 	}
 
 	void OnDisconnectedFromServer()
 	{
 		GameObject.Find("OVRCameraController").transform.parent = GameObject.Find("Player1").transform;
 		GameObject.Find("Menus").transform.localPosition = new Vector3(-1.4f, 0f, 1.43f);
-		GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(-0.2f, 0.1f, 0.1f);
+		GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(-0.212f, 0.1f, 0.1f);
 		GameObject.Find ("Player2").transform.localRotation = Quaternion.identity;
+		GameController.newPopupInfo ("disconnected");
 	}
 
 	void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
@@ -187,7 +183,7 @@ public class GameNetworkManager : MonoBehaviour {
 		}
 
 		//GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(-1f, -0.6f,1f);
-		GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(-0.2f, 0.1f, 0.1f);
+		GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(-0.212f, 0.1f, 0.1f);
 	}
 	
 	// Update is called once per frame
@@ -248,7 +244,11 @@ public class GameNetworkManager : MonoBehaviour {
 		else if(menuItems[selectedIndex].name.ToLower().Contains("join"))
 		{
 			if(hostList.Length > 0)
+			{
+				GameController.newPopupInfo ("joining...");
 				JoinServer(hostList[0]);
+			}
+
 		}
 		else if(menuItems[selectedIndex].name.ToLower().Contains("disconnect"))
 		{
