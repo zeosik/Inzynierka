@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System.IO;
 
 public class GameNetworkManager : MonoBehaviour {
 
@@ -22,8 +23,7 @@ public class GameNetworkManager : MonoBehaviour {
 	private void StartServer()
 	{
 		GameController.newPopupInfo ("starting server...");
-		//MasterServer.ipAddress = "127.0.0.1";
-		Network.InitializeServer(4, 25000, !Network.HavePublicAddress());
+		Network.InitializeServer(4, 25000, false);
 		MasterServer.RegisterHost(typeName, gameName);
 		menuItems[selectedIndex].interactable = false;
 		selectNext();
@@ -39,9 +39,6 @@ public class GameNetworkManager : MonoBehaviour {
 				btn.interactable = false;
 			}
 		}
-		//this.GetComponent<NetworkView>().viewID = Network.AllocateViewID();
-		//GameObject obj = (GameObject)Network.Instantiate(prefab, this.transform.position, Quaternion.identity, 0);
-		//obj.transform.parent = this.transform;
 		print("Server Initialized");
 		GameController.newPopupInfo ("server started");
 	}
@@ -74,7 +71,7 @@ public class GameNetworkManager : MonoBehaviour {
 	}
 	void JoinServer(HostData hostData)
 	{
-		print ("connecting to: " + hostData.ip);
+		print ("connecting");
 		GameController.newPopupInfo ("connecting...");
 		Network.Connect(hostData);
 	}
@@ -95,7 +92,7 @@ public class GameNetworkManager : MonoBehaviour {
 		if(Network.isClient)
 		{
 			GameObject.Find("OVRCameraController").transform.parent = GameObject.Find("Player2").transform;
-			GameObject.Find("Menus").transform.localPosition = new Vector3(-2.5f, 0f, 1.43f);
+			GameObject.Find("Menus").transform.localPosition = new Vector3(-2.722f, 0f, 1.581f);
 		}
 		else
 		{
@@ -166,13 +163,22 @@ public class GameNetworkManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
+		if (File.Exists ("hostip.txt"))
+		{
+			StreamReader sr = new StreamReader ("hostip.txt");
+			string ip = sr.ReadLine ();
+			sr.Close ();
+			MasterServer.ipAddress = ip;
+		}
+
+
 		menu = gameObject.transform.GetComponent<GameNetworkManager>();
 		menuItems[selectedIndex].Select();
 		menuItems[2].interactable = false;
 		if(Network.isClient)
 		{
 			GameObject.Find("OVRCameraController").transform.parent = GameObject.Find("Player2").transform;
-			GameObject.Find("Menus").transform.localPosition = new Vector3(-2.5f, 0f, 1.43f);
+			GameObject.Find("Menus").transform.localPosition = new Vector3(-2.722f, 0f, 1.581f);
 			//GameObject.Find("Menus").transform.parent = GameObject.Find("Player2").transform;
 		}
 		else
@@ -243,12 +249,18 @@ public class GameNetworkManager : MonoBehaviour {
 		}
 		else if(menuItems[selectedIndex].name.ToLower().Contains("join"))
 		{
-			if(hostList.Length > 0)
+			if(Network.isServer)
 			{
-				GameController.newPopupInfo ("joining...");
-				JoinServer(hostList[0]);
+				GameController.newPopupInfo ("you're host, disconnect first");
 			}
-
+			else
+			{
+				if(hostList.Length > 0)
+				{
+					GameController.newPopupInfo ("joining...");
+					JoinServer(hostList[0]);
+				}
+			}
 		}
 		else if(menuItems[selectedIndex].name.ToLower().Contains("disconnect"))
 		{
