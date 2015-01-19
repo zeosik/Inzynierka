@@ -6,6 +6,7 @@ using System.IO;
 public class GameNetworkManager : MonoBehaviour {
 
 	public Button[] menuItems;
+	public AudioSource click;
 
 	private int selectedIndex = 0;
 
@@ -27,6 +28,22 @@ public class GameNetworkManager : MonoBehaviour {
 		MasterServer.RegisterHost(typeName, gameName);
 		menuItems[selectedIndex].interactable = false;
 		selectNext();
+	}
+
+	
+	void OnFailedToConnectToMasterServer(NetworkConnectionError info)
+	{
+		menu.menuItems[discButtIndex].interactable = true;
+		foreach(Button btn in menuItems)
+		{
+			if(btn.name.ToLower().Contains("start"))
+			{
+				btn.interactable = true;
+			}
+		}
+		print("ERROR connecting to MasterServer: " + info);
+		GameController.newPopupInfo ("error connecting to MasterServer: " + info);
+		Disconnect();
 	}
 	
 	void OnServerInitialized()
@@ -66,7 +83,6 @@ public class GameNetworkManager : MonoBehaviour {
 				menuItems[2].interactable = false;
 				GameController.newPopupInfo ("not found");
 			}
-
 		}
 	}
 	void JoinServer(HostData hostData)
@@ -198,11 +214,15 @@ public class GameNetworkManager : MonoBehaviour {
 		{
 			if(Input.GetKeyDown(KeyCode.DownArrow))
 			{
+				
+				click.Play();
 				selectNext();
 				
 			} 
 			else if(Input.GetKeyDown(KeyCode.UpArrow))
 			{
+				
+				click.Play();
 				selectPrev();
 				
 			} 
@@ -214,7 +234,14 @@ public class GameNetworkManager : MonoBehaviour {
 					return;
 				}
 				if(menuItems[selectedIndex].interactable)
+				{
+					click.Play();
 					executeAction();
+				}
+			}
+			else if(Input.GetKeyDown(KeyCode.Escape))
+			{
+				click.Play();
 			}
 		}
 	}

@@ -6,6 +6,7 @@ public class BobsleighMenuController : MonoBehaviour {
 
 	public Button[] menuItems;
 	public string mapChoosingSceneName;
+	public AudioSource click;
 	static BobsleighMenuController menu;
 
 	bool menuActive = false;
@@ -45,15 +46,22 @@ public class BobsleighMenuController : MonoBehaviour {
 			menuItems[pauseResumeButtonIndex].GetComponentInChildren<Text>().text = (gamePaused ? "resume " : "pause ") + "game";
 			if(Input.GetKeyDown(KeyCode.DownArrow))
 			{
+				click.Play();
 				selectNext();
 			} 
 			else if(Input.GetKeyDown(KeyCode.UpArrow))
 			{
+				click.Play();
 				selectPrev();
 			} 
 			else if(Input.GetKeyDown(KeyCode.Return))
 			{
+				click.Play();
 				executeAction();
+			}
+			else if(Input.GetKeyDown(KeyCode.Escape))
+			{
+				click.Play();
 			}
 		}
 	}

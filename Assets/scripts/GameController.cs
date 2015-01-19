@@ -54,9 +54,6 @@ public class GameController : MonoBehaviour {
 			else if(!Network.isClient)
 				togglePauseGame();
 		}
-		if (Input.GetKeyDown (KeyCode.O)) {
-			GameController.newPopupInfo ("hellohellohello");
-		}
 		if(Input.GetKeyDown(KeyCode.Escape)) {
 			if(inNetworkMenu)
 				toggleNetworkMenu();
