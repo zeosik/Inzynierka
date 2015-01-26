@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.IO;
+using System.Text.RegularExpressions;
 
 public class GameNetworkManager : MonoBehaviour {
 
@@ -100,9 +101,18 @@ public class GameNetworkManager : MonoBehaviour {
 		menuItems[2].interactable = false;
 		menuItems[0].interactable = true;
 	}
-	
+
+	void OnPlayerConnected(NetworkPlayer player)
+	{
+		this.networkView.RPC("syncPause", player, GameController.isPaused());
+		this.networkView.RPC("syncTrack", player, Application.loadedLevelName);
+	}
+
 	void OnConnectedToServer()
 	{
+		if(Network.isServer)
+			print ("someone connected");
+
 		menu.menuItems[discButtIndex].interactable = true;
 		menuItems[2].interactable = false;
 		if(Network.isClient)
@@ -181,10 +191,22 @@ public class GameNetworkManager : MonoBehaviour {
 	{
 		if (File.Exists ("hostip.txt"))
 		{
+			string pattern = "^[0-9]{1,3}\u002E[0-9]{1,3}\u002E[0-9]{1,3}\u002E[0-9]{1,3}$";
+			Regex rgx = new Regex(pattern);
+			bool local = false;
 			StreamReader sr = new StreamReader ("hostip.txt");
-			string ip = sr.ReadLine ();
+			string line = sr.ReadLine().Replace(" ", "");
+			if(line.Split('=')[0].Equals("local"))
+				if(line.Split('=')[1].Equals("true"))
+					local = true;
+			if(local)
+			{
+				line = sr.ReadLine().Replace(" ", "");
+				if(line.Split('=')[0].Equals("ip"))
+					if(rgx.IsMatch(line.Split('=')[1]))
+						MasterServer.ipAddress = line.Split('=')[1];
+			}
 			sr.Close ();
-			MasterServer.ipAddress = ip;
 		}
 
 
@@ -206,6 +228,12 @@ public class GameNetworkManager : MonoBehaviour {
 
 		//GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(-1f, -0.6f,1f);
 		GameObject.Find("OVRCameraController").transform.localPosition = new Vector3(-0.212f, 0.1f, 0.1f);
+
+		if(Network.isServer)
+		{
+			this.networkView.RPC("syncPause", RPCMode.Others, GameController.isPaused());
+			this.networkView.RPC("syncTrack", RPCMode.Others, Application.loadedLevelName);
+		}
 	}
 	
 	// Update is called once per frame
@@ -330,6 +358,18 @@ public class GameNetworkManager : MonoBehaviour {
 		GameController.togglePauseGame();
 	}
 	[RPC]
+	public void pauseGame()
+	{
+		if(!GameController.isPaused())
+			GameController.togglePauseGame();
+	}
+	[RPC]
+	public void unpauseGame()
+	{
+		if(GameController.isPaused())
+			GameController.togglePauseGame();
+	}
+	[RPC]
 	public void restartGame()
 	{
 		BobsleighController.restartGame();
@@ -338,5 +378,27 @@ public class GameNetworkManager : MonoBehaviour {
 	public void updatePlayerRotation(string playerName, Quaternion rotation )
 	{
 		GameObject.Find (playerName).transform.localRotation = rotation;
+	}
+	[RPC]
+	public void syncPause(bool paused)
+	{
+		if(paused)
+		{
+			if(!GameController.isPaused())
+				GameController.togglePauseGame();
+		}
+		else
+		{
+			if(GameController.isPaused())
+				GameController.togglePauseGame();
+		}
+	}
+	[RPC]
+	public void syncTrack(string levelName)
+	{
+		if(Application.loadedLevelName.Equals(levelName))
+			return;
+		else
+			Application.LoadLevel(levelName);
 	}
 }

@@ -50,7 +50,14 @@ public class GameController : MonoBehaviour {
 		if(Input.GetKeyDown(KeyCode.P)) {
 			//togglePauseGame();
 			if(Network.isServer)
-				GameObject.Find("bobslej").networkView.RPC("togglePauseGame", RPCMode.All, null);
+			{
+				togglePauseGame();
+				if(paused)
+					//GameObject.Find("bobslej").networkView.RPC("togglePauseGame", RPCMode.All, null);
+					GameObject.Find("bobslej").networkView.RPC("pauseGame", RPCMode.Others, null);
+				else
+					GameObject.Find("bobslej").networkView.RPC("unpauseGame", RPCMode.Others, null);
+		    }
 			else if(!Network.isClient)
 				togglePauseGame();
 		}

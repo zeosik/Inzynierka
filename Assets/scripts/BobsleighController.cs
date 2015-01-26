@@ -157,7 +157,8 @@ public class BobsleighController : MonoBehaviour {
 	static public void gameWon()
 	{
 		if(Network.isServer)
-			GameObject.Find("bobslej").networkView.RPC("togglePauseGame", RPCMode.All, null);
+			//GameObject.Find("bobslej").networkView.RPC("togglePauseGame", RPCMode.All, null);
+			GameObject.Find("bobslej").networkView.RPC("pauseGame", RPCMode.All, null);
 		else if(!Network.isClient)
 			pause();
 	}
@@ -165,10 +166,29 @@ public class BobsleighController : MonoBehaviour {
 	static public void restartGame()
 	{
 		timer = 0f;
-		bobsleigh.rigidbody.position = bobsleigh.startingPosition;
-		bobsleigh.rigidbody.rotation = bobsleigh.startingRotation;
-		bobsleigh.rigidbody.velocity = Vector3.zero;
-		bobsleigh.rigidbody.angularVelocity = Vector3.zero;
+		if(bobsleigh.rigidbody.isKinematic)
+		{
+			bobsleigh.rigidbody.isKinematic = false;
+			bobsleigh.rigidbody.position = bobsleigh.startingPosition;
+			bobsleigh.rigidbody.rotation = bobsleigh.startingRotation;
+			bobsleigh.transform.position = bobsleigh.rigidbody.position;
+			bobsleigh.transform.rotation = bobsleigh.rigidbody.rotation;
+			bobsleigh.rigidbody.velocity = Vector3.zero;
+			bobsleigh.rigidbody.angularVelocity = Vector3.zero;
+			bobsleigh.velocity = bobsleigh.rigidbody.velocity;
+			bobsleigh.angularVelocity = bobsleigh.rigidbody.angularVelocity;
+			bobsleigh.rigidbody.isKinematic = true;
+		}
+		else
+		{
+			bobsleigh.rigidbody.position = bobsleigh.startingPosition;
+			bobsleigh.rigidbody.rotation = bobsleigh.startingRotation;
+			bobsleigh.rigidbody.isKinematic = false;
+			bobsleigh.rigidbody.velocity = Vector3.zero;
+			bobsleigh.rigidbody.angularVelocity = Vector3.zero;
+			bobsleigh.velocity = bobsleigh.rigidbody.velocity;
+			bobsleigh.angularVelocity = bobsleigh.rigidbody.angularVelocity;
+		}
 		if(!GameController.isPaused())
 			GameController.togglePauseGame();
 	}

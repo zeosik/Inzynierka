@@ -88,7 +88,13 @@ public class BobsleighMenuController : MonoBehaviour {
 		{
 			gamePaused = !gamePaused;
 			if(Network.isServer)
-				GameObject.Find("bobslej").networkView.RPC("togglePauseGame", RPCMode.All, null);
+			{
+				//GameObject.Find("bobslej").networkView.RPC("togglePauseGame", RPCMode.All, null);
+				if(gamePaused)
+					GameObject.Find("bobslej").networkView.RPC("pauseGame", RPCMode.All, null);
+				else
+					GameObject.Find("bobslej").networkView.RPC("unpauseGame", RPCMode.All, null);
+			}
 			else if(!Network.isClient)
 				togglePauseGame();
 			else
@@ -110,6 +116,8 @@ public class BobsleighMenuController : MonoBehaviour {
 		}
 		else if (menuItems[selectedIndex].name.ToLower().Contains("exit"))
 		{
+			if(Network.isClient)
+				Network.Disconnect();
 			Application.LoadLevel(mapChoosingSceneName);
 		}
 	}
